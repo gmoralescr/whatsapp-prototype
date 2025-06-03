@@ -1,1 +1,37 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./api
+    env_file: .env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - parse
+      - db
+
+  parse:
+    build: ./parse
+    volumes:
+      - ./models:/models         # put gguf here
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4g
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: wa
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+
+volumes:
+  dbdata:
 
